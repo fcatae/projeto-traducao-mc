@@ -12,6 +12,22 @@ Copiar o pacote JKS para o diretório `src/main/resources`
 
 Configurar o conector `HTTP Listener` para usar o protocolo `HTTPS` na porta 8082.
 
+# Fazer chamadas HTTP com OAuth (client credentials)
+
+Adicionar o módulo OAuth nas ferramentas.
+
+```xml
+<dependency>
+    <groupId>org.mule.modules</groupId>
+    <artifactId>mule-oauth-module</artifactId>
+    <version>1.1.11</version>
+    <classifier>mule-plugin</classifier>
+</dependency>
+```
+
+Configurar a autenticação Client Credentials no HTTP Request.
+
+
 # Adicionar implementação Java
 
 Criar o arquivo `LimpaCaracter.java` no diretório `src/main/java` contendo uma
