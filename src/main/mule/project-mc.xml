@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
+	<http:listener-config name="TLS_HTTPS_Listener_config" doc:name="HTTP Listener config" doc:id="aadbf268-58b3-4b02-bbe9-36e7467451cf" >
+		<http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store type="jks" path="./self.jks" alias="self" keyPassword="disparador" password="disparador" />
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config_LOGGER" doc:name="HTTP Listener config" doc:id="52e7e883-205c-4041-984e-50b2ceb38677" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="4ef020a6-eaf5-41e1-acc8-32254402ea6e" >
+		<http:request-connection host="localhost" port="8083" >
+			<http:authentication >
+				<oauth:client-credentials-grant-type clientId="75c3b4e11b2342bfbd474670a3d37fdc" clientSecret="af09c229F72749abb3F073752041A806" scopes="openid" tokenUrl="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="241e9a28-8175-4c70-a4b5-aadf9757ee85" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="fluxo_remove_acentuacao" doc:id="bb799129-9c81-4663-8933-bd8b95d18e72" >
+		<http:listener doc:name="8081" doc:id="6a4553f3-7353-4d35-93f3-9391d2642117" config-ref="HTTP_Listener_config" path="/case1"/>
+		<set-variable value="#[attributes.queryString]" doc:name="query string" doc:id="497ad1bb-d7d0-46eb-83fd-347f614ead38" variableName="str"/>
+		<ee:transform doc:name="remove caracteres" doc:id="2eb93fe9-80d7-4731-aaec-a35e28bffc54" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import java!util::LimpaCaracter
+output application/json
+---
+{
+	entrada: vars.str,
+	saida: java!util::LimpaCaracter::limpar(vars.str) 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="log" doc:id="aecf2e25-31bf-4af3-98ac-7a70b585ede0" config-ref="HTTP_Request_configuration" path="/"/>
+	</flow>
+	<flow name="fluxo_HTTPS_OAuth" doc:id="31efde22-b8dc-414b-86b2-25910cd4caaa" >
+		<http:listener doc:name="Listener" doc:id="1d2e498f-8028-4039-b365-80a3ddb30cb8" config-ref="TLS_HTTPS_Listener_config" path="/*"/>
+		<http:request method="#[attributes.method]" doc:name="Request" doc:id="7b2b7b9f-a401-4813-888d-982508977348" path="#[attributes.requestPath]" config-ref="HTTP_Request_configuration"/>
+	</flow>
+	<flow name="fluxo_LOGGER_8083" doc:id="1761a6b0-3e57-4d0e-82c0-8c6a0caf55be" >
+		<http:listener doc:name="Listener" doc:id="67268de2-04a6-479d-a424-f68883c1bf6b" config-ref="HTTP_Listener_config_LOGGER" path="/*"/>
+		<logger level="INFO" doc:name="attributes" doc:id="a1ecbfe1-940b-4522-ac73-167370ef4494" message="#[attributes]"/>
+		<logger level="INFO" doc:name="Authorization" doc:id="c68c6f9a-b99d-421e-b6a0-bc14a83bee61" message="#[attributes.headers.authorization]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="891cee36-f8a5-481c-a67f-de773b8050f4" message="#[output application/json --- payload]"/>
+	</flow>
+</mule>
