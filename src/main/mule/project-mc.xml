@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oa
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="4ef020a6-eaf5-41e1-acc8-32254402ea6e" >
 		<http:request-connection host="localhost" port="8083" >
 			<http:authentication >
-				<oauth:client-credentials-grant-type clientId="75c3b4e11b2342bfbd474670a3d37fdc" clientSecret="af09c229F72749abb3F073752041A806" scopes="openid" tokenUrl="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token" />
+				<oauth:client-credentials-grant-type clientId="0000000000000000000000000000000" clientSecret="0000000000000000000000000000000" scopes="openid" tokenUrl="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token" />
 			</http:authentication>
 		</http:request-connection>
 	</http:request-config>
