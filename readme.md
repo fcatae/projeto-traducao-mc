@@ -12,3 +12,29 @@ Copiar o pacote JKS para o diretório `src/main/resources`
 
 Configurar o conector `HTTP Listener` para usar o protocolo `HTTPS` na porta 8082.
 
+# Adicionar implementação Java
+
+Criar o arquivo `LimpaCaracter.java` no diretório `src/main/java` contendo uma
+classe estática pública. Por exemplo:
+
+```java
+public class LimpaCaracter {
+	public static String limpar(String texto) {
+		return "Ola Jose";
+	}
+}
+```
+
+Referenciar esse arquivo no Data Weave usando o `import`.
+
+```dw
+%dw 2.0
+output application/json
+import java!LimpaCaracter
+---
+{
+	entrada: vars.str,
+	saida: java!LimpaCaracter::limpar(vars.str) 
+}
+```
+
